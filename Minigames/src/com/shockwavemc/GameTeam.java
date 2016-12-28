@@ -21,7 +21,11 @@ public class GameTeam {
 		scoreTeam.setPrefix(c + "");
 	}
 	
-	public GameTeam(Color c) {
-		
+	public GameTeam(String name, Color c, boolean friendlyFire) {
+		scoreTeam = Minigames.getBoard().registerNewTeam(name);
+		scoreTeam.setAllowFriendlyFire(friendlyFire);
+		scoreTeam.setCanSeeFriendlyInvisibles(!friendlyFire);
+		scoreTeam.setDisplayName(c + name);
+		setColour(c);
 	}
 }
