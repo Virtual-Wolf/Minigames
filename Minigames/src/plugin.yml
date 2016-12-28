@@ -1,0 +1,6 @@
+name: Minigames
+version: 0.1
+author: Virtual_Wolf
+main: com.shockwavemc.Minigames
+commands:
+   mg:
