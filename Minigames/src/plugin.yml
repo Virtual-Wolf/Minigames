@@ -1,5 +1,6 @@
 name: Minigames
 version: 0.1
+load: startup
 author: Virtual_Wolf
 main: com.shockwavemc.Minigames
 commands:

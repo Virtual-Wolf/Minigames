@@ -21,13 +21,13 @@ public class GameCommand implements CommandExecutor {
 			isPlayer = true;
 		}
 		if(args.length == 0 || args[0].equalsIgnoreCase("help")) {
-			sender.sendMessage("" + ChatColor.GOLD + ChatColor.ITALIC + "Minigames Commands:\n"
-					+ "/mg join" + ChatColor.GRAY + ": Join the minigames\n"
-					+ "/mg leave" + ChatColor.GRAY + ": Leave the minigames\n"
-					+ "/mg help" + ChatColor.GRAY + ": Display this help menu\n"
-					+ "/mg force" + ChatColor.GRAY + ": Force a certain game to be chosen\n     " + ChatColor.RED  + ChatColor.BOLD + "OPS ONLY\n"
-					+ "/mg start" + ChatColor.GRAY + ": Make the minigames start forcibly     " + ChatColor.RED  + ChatColor.BOLD + "OPS ONLY\n"
-					+ "/mg stop" + ChatColor.GRAY + ": Make the minigames stop forcibly     " + ChatColor.RED  + ChatColor.BOLD + "OPS ONLY\n");
+			sender.sendMessage("" + ChatColor.GOLD + ChatColor.ITALIC + "Minigames Commands" + ChatColor.GRAY + ":\n"
+					+ ChatColor.GOLD + ChatColor.ITALIC + "/mg join" + ChatColor.GRAY + ": Join the minigames\n"
+					+ ChatColor.GOLD + ChatColor.ITALIC + "/mg leave" + ChatColor.GRAY + ": Leave the minigames\n"
+					+ ChatColor.GOLD + ChatColor.ITALIC + "/mg help" + ChatColor.GRAY + ": Display this help menu\n"
+					+ ChatColor.GOLD + ChatColor.ITALIC + "/mg force" + ChatColor.GRAY + ": Force a certain game to be chosen\n " + ChatColor.RED  + ChatColor.BOLD + "OPS ONLY\n"
+					+ ChatColor.GOLD + ChatColor.ITALIC + "/mg start" + ChatColor.GRAY + ": Make the minigames start forcibly " + ChatColor.RED  + ChatColor.BOLD + "OPS ONLY\n"
+					+ ChatColor.GOLD + ChatColor.ITALIC + "/mg stop" + ChatColor.GRAY + ": Make the minigames stop forcibly " + ChatColor.RED  + ChatColor.BOLD + "OPS ONLY\n");
 			return false;
 		} else {
 			if(args[0].equalsIgnoreCase("join")) {
@@ -45,6 +45,9 @@ public class GameCommand implements CommandExecutor {
 					p.teleport(Minigames.spawn);
 					p.setGameMode(GameMode.ADVENTURE);
 					p.setFlying(false);
+					p.setHealth(p.getMaxHealth());
+					p.setFoodLevel(20);
+					p.setSaturation(10000);
 					p.sendMessage(ChatColor.GRAY + "Minigames will start shortly!");
 					if(!Minigames.starting) {
 						Minigames.run();

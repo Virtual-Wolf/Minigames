@@ -8,13 +8,24 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.WorldCreator;
+import org.bukkit.generator.BlockPopulator;
+import org.bukkit.generator.ChunkGenerator;
 
 public class WorldUtils {
 
-	public void copyWorld(File source, File target){
+	public static void createWorld(String name) {
+		WorldCreator wc = new WorldCreator(name);
+		wc.generator(new VoidGenerator());
+		wc.createWorld();
+	}
+
+	public static void copyWorld(File source, File target){
 		try {
 	        ArrayList<String> ignore = new ArrayList<String>(Arrays.asList("uid.dat", "session.dat", "session.lock"));
 	        if(!ignore.contains(source.getName())) {
@@ -41,7 +52,7 @@ public class WorldUtils {
 		} catch (IOException e) {}
 	}
 	
-	public boolean deleteWorld(World w) {
+	public static boolean deleteWorld(World w) {
 		File path = w.getWorldFolder();
 		Bukkit.unloadWorld(w, false);
 	      if(path.exists()) {
@@ -57,7 +68,7 @@ public class WorldUtils {
 	      return(path.delete());
 	}
 	
-	public boolean deleteWorld(File path) {
+	public static boolean deleteWorld(File path) {
 	      if(path.exists()) {
 	          File files[] = path.listFiles();
 	          for(int i=0; i<files.length; i++) {
@@ -69,5 +80,25 @@ public class WorldUtils {
 	          }
 	      }
 	      return(path.delete());
+	}
+	
+	
+	
+	
+	public static class VoidGenerator extends ChunkGenerator {
+		@Override
+		public List<BlockPopulator> getDefaultPopulators(World world) {
+			return new ArrayList<BlockPopulator>(); // Empty list
+	       }
+	 
+		@Override
+		public boolean canSpawn(World world, int x, int z) {
+			return true;
+		}
+	 
+		@Override
+		public byte[][] generateBlockSections(World world, Random random, int chunkx, int chunkz, ChunkGenerator.BiomeGrid biomes) {
+			return new byte[world.getMaxHeight() / 16][];
+		}
 	}
 }

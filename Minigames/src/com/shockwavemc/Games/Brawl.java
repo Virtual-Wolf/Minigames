@@ -48,7 +48,6 @@ public class Brawl implements Minigame, Listener {
 	@SuppressWarnings("deprecation")
 	@Override
 	public void run() {
-		WorldFile wf = new WorldFile(Minigames.getGameWorld());
 		if(players.size() > 1) {
 			thisRound = players;
 			if(thisRound.size() > 1) {
@@ -57,15 +56,17 @@ public class Brawl implements Minigame, Listener {
 				p2 = thisRound.get(r.nextInt(thisRound.size()));
 				thisRound.remove(p2);
 				Minigames.Broadcast(false, "&c&o" + p1 + "&7 vs &b&o" + p2);
-				Bukkit.getPlayer(p1).teleport(wf.getLocation("spawn1"));
-				Bukkit.getPlayer(p2).teleport(wf.getLocation("spawn2"));
+				Bukkit.getPlayer(p1).teleport(Minigames.getGameWorldFile().getLocation("spawn1"));
+				Bukkit.getPlayer(p2).teleport(Minigames.getGameWorldFile().getLocation("spawn2"));
 			} else {
 				thisRound.clear();
 				thisRound = players;
 				run();
 			}
 		} else {
-			//end game
+			players.clear();
+			thisRound.clear();
+			Minigames.end();
 		}
 	}
 	
@@ -82,14 +83,13 @@ public class Brawl implements Minigame, Listener {
 	
 	@EventHandler
 	public void playerLeave(PlayerQuitEvent e) {
-		String n = e.getPlayer().getName();
-		
+		killPlayer(e.getPlayer());
 	}
 	
 	@EventHandler
 	public void onCombat(EntityDamageByEntityEvent e) {
 		if(gameRunning()) {
-			if(e.getDamager() instanceof Player && e.getEntity() instanceof Player) {
+			if(e.getDamager() instanceof Player && e.getEntity() instanceof Player && Minigames.getPlayerList().contains(((Player)e.getEntity()).getName())) {
 				e.setDamage(0);
 				Player p = (Player) e.getEntity();
 				Player d = (Player) e.getDamager();
@@ -102,8 +102,13 @@ public class Brawl implements Minigame, Listener {
 
 	@Override
 	public void killPlayer(Player p) {
-		// TODO Auto-generated method stub
-		
+		if(players.contains(p.getName())) {
+			players.remove(p.getName());
+			if(thisRound.contains(p.getName())) {
+				thisRound.remove(p.getName());
+			}
+		}
+		p.teleport(Minigames.getGameWorldFile().getLocation("lobby"));
 	}
 
 	@Override
