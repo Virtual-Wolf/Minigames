@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import com.shockwavemc.Game;
@@ -38,7 +39,6 @@ public class Brawl implements Minigame, Listener {
 	@Override
 	public void teamSplit() {
 		for(String s : Minigames.getPlayerList()) {
-			Minigames.getTeamList().get(0).add(Bukkit.getPlayer(s));
 			players.add(s);
 		}
 	}
@@ -49,7 +49,6 @@ public class Brawl implements Minigame, Listener {
 	@Override
 	public void run() {
 		if(players.size() > 1) {
-			thisRound = players;
 			if(thisRound.size() > 1) {
 				p1 = thisRound.get(r.nextInt(thisRound.size()));
 				thisRound.remove(p1);
@@ -66,7 +65,7 @@ public class Brawl implements Minigame, Listener {
 		} else {
 			players.clear();
 			thisRound.clear();
-			Minigames.end();
+			Minigames.end(players.get(0));
 		}
 	}
 	
@@ -83,13 +82,15 @@ public class Brawl implements Minigame, Listener {
 	
 	@EventHandler
 	public void playerLeave(PlayerQuitEvent e) {
-		killPlayer(e.getPlayer());
+		if(gameRunning()) {
+			killPlayer(e.getPlayer());
+		}
 	}
 	
 	@EventHandler
 	public void onCombat(EntityDamageByEntityEvent e) {
 		if(gameRunning()) {
-			if(e.getDamager() instanceof Player && e.getEntity() instanceof Player && Minigames.getPlayerList().contains(((Player)e.getEntity()).getName())) {
+			if(e.getDamager() instanceof Player && e.getEntity() instanceof Player && Minigames.getPlayerList().contains(((Player)e.getEntity()).getName())  ) {
 				e.setDamage(0);
 				Player p = (Player) e.getEntity();
 				Player d = (Player) e.getDamager();
@@ -99,16 +100,31 @@ public class Brawl implements Minigame, Listener {
 			}
 		}
 	}
+	
+	@EventHandler
+	public void onCombat(EntityDamageEvent e) {
+		if(gameRunning()) {
+			if(e.getEntity() instanceof Player && Minigames.getPlayerList().contains(((Player)e.getEntity()).getName())  ) {
+				e.setDamage(0);
+			}
+		}
+	}
 
 	@Override
 	public void killPlayer(Player p) {
-		if(players.contains(p.getName())) {
-			players.remove(p.getName());
-			if(thisRound.contains(p.getName())) {
-				thisRound.remove(p.getName());
+		if(gameRunning()) {
+			p.setHealth(p.getMaxHealth());
+			if(players.contains(p.getName())) {
+				players.remove(p.getName());
+				if(thisRound.contains(p.getName())) {
+					thisRound.remove(p.getName());
+				}
 			}
+			if(isBrawler(p)) {
+				run();
+			}
+			p.teleport(Minigames.getGameWorldFile().getLocation("lobby"));
 		}
-		p.teleport(Minigames.getGameWorldFile().getLocation("lobby"));
 	}
 
 	@Override

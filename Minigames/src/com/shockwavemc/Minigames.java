@@ -20,7 +20,7 @@ import com.shockwavemc.Utils.WorldFile;
 import com.shockwavemc.Utils.WorldUtils;
 
 public class Minigames extends JavaPlugin {
-	private ScoreboardManager sMan = Bukkit.getScoreboardManager();
+	private static ScoreboardManager sMan;
 	private static Scoreboard board;
 	private static Game current;
 	public static boolean inGame, starting = false;
@@ -32,9 +32,12 @@ public class Minigames extends JavaPlugin {
 	
 	public void onEnable() {
 		instance = this;
-		board = sMan.getNewScoreboard();
 		new GameCommand(this);
+		new WorldCommand(this);
 		new GameListener(this);
+		Database.enable();
+		sMan = Bukkit.getScoreboardManager();
+		board = sMan.getNewScoreboard();
 	}
 	
 	public void onDisable() {
@@ -58,6 +61,10 @@ public class Minigames extends JavaPlugin {
 	}
 	
 	public static Scoreboard getBoard() {
+		if(board == null) {
+			sMan = Bukkit.getScoreboardManager();
+			board = sMan.getNewScoreboard();
+		}
 		return board;
 	}
 	
@@ -71,7 +78,7 @@ public class Minigames extends JavaPlugin {
 	}
 	
 	public static void Broadcast(boolean prefix, String message) {
-		Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', prefix ? ("" + ChatColor.GOLD + ChatColor.ITALIC + "Minigames:") : ("") + ChatColor.GRAY + " "));
+		Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', (prefix ? ("&9&oMinigames&7: ") : ("")) + "&7" + message));
 	}
 	
 	private static void getNewGame() {
@@ -90,11 +97,15 @@ public class Minigames extends JavaPlugin {
 		}
 		starting = true;
 		getNewGame();
-		Broadcast(false, "&e&l" + current.name + " &7" + ChatColor.ITALIC + " has been chosen as the next game.");
+		Broadcast(false, "&e&l" + current.name + " &7&o has been chosen as the next game.");
 		countdown(45);
 	}
 	
 	private static void countdown(int num) {
+		if(getPlayerList().size() < 2){
+			Broadcast(false, "&7Game cancelled! not enough players.");
+			return;
+		}
 		if(num> 0) {
 			if(num == 45 || num == 30 || num == 15 || num == 10 || num ==5 || num == 4 || num == 3 || num == 2 || num == 1) {
 				Broadcast(true, "&6&o" + current.name + "&7 will start in &6&o" + num + "&7 seconds");
@@ -112,7 +123,7 @@ public class Minigames extends JavaPlugin {
 	}
 	public static int currentID;
 	private static void loadWorld() {
-		ArrayList<String> maps = Database.MAPS.getAll("Game", current.name);
+		ArrayList<String> maps = Database.MAPS.getAll("Game", current.name, "Name");
 		String map = maps.get(r.nextInt(maps.size()));
 		Broadcast(true, "&7The map &6&o" + map + " &7has been selected");
 		Broadcast(false, "&7Loading world...");
@@ -123,12 +134,17 @@ public class Minigames extends JavaPlugin {
 	}
 	
 	@SuppressWarnings("deprecation")
-	public static void end() {
-		for(String s : Minigames.getPlayerList()) {
-			Player p = Bukkit.getPlayer(s);
-			p.teleport(Bukkit.getWorld("Minigames").getSpawnLocation());
-			p.setGameMode(GameMode.ADVENTURE);
-		}
-		run();
+	public static void end(String winner) {
+		Broadcast(true, "&a&l" + winner + "&7 has won &6&0" + getCurrentGame().name);
+		Bukkit.getScheduler().runTaskLater(Minigames.instance, new Runnable() {
+			public void run() {
+				for(String s : Minigames.getPlayerList()) {
+					Player p = Bukkit.getPlayer(s);
+					p.teleport(spawn);
+					p.setGameMode(GameMode.ADVENTURE);
+				}
+				Minigames.run();
+			}
+		}, 100);
 	} 
 }

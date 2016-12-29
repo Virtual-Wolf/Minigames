@@ -23,11 +23,16 @@ public class WorldFile {
 	
 	public void reloadConfig() {
 	    if(configFile == null) {
-	    	configFile = new File(world.getWorldFolder(), "worldfile.yml");
-			if(!configFile.exists()) {
-			    configFile.mkdir();	
-			}
+	    	configFile = new File(world.getWorldFolder() + "/worldfile.yml");
 	    }
+	    if(!configFile.exists()) {
+		    try {
+				configFile.createNewFile();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	    config = YamlConfiguration.loadConfiguration(configFile);
 	}
 	

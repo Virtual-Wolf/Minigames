@@ -1,10 +1,12 @@
 package com.shockwavemc;
 
 import com.shockwavemc.Games.*;
+
+import org.bukkit.ChatColor;
 import org.bukkit.Color;
 
 public enum Game {
-	Brawl(new Brawl(Minigames.instance), "Brawl", "", true, false, new GameTeam[] {new GameTeam("Players", Color.YELLOW, true)});
+	Brawl(new Brawl(Minigames.instance), "Brawl", "", true, false, new GameTeam[] {new GameTeam("Players", ChatColor.YELLOW, true)});
 	
 	
 	

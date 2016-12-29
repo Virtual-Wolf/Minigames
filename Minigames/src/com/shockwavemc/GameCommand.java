@@ -33,7 +33,7 @@ public class GameCommand implements CommandExecutor {
 			if(args[0].equalsIgnoreCase("join")) {
 				if(args.length > 1) {
 					sender.sendMessage(ChatColor.RED + "Incorrect Syntax. Use /mg join");
-					return false;
+				return false;
 				}
 				if(!isPlayer) {
 					sender.sendMessage(ChatColor.RED + "Only players can join minigames!");
@@ -47,7 +47,7 @@ public class GameCommand implements CommandExecutor {
 					p.setFlying(false);
 					p.setHealth(p.getMaxHealth());
 					p.setFoodLevel(20);
-					p.setSaturation(10000);
+					p.setSaturation(20);
 					p.sendMessage(ChatColor.GRAY + "Minigames will start shortly!");
 					if(!Minigames.starting) {
 						Minigames.run();
