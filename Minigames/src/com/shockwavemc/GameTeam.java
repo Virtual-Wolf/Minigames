@@ -1,6 +1,7 @@
 package com.shockwavemc;
 
 import org.bukkit.Color;
+import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Team;
 
 public class GameTeam {
@@ -19,6 +20,11 @@ public class GameTeam {
 	public void setColour(Color c) {
 		colour = c;
 		scoreTeam.setPrefix(c + "");
+	}
+	
+	@SuppressWarnings("deprecation")
+	public void add(Player p) {
+		scoreTeam.addPlayer(p);
 	}
 	
 	public GameTeam(String name, Color c, boolean friendlyFire) {

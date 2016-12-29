@@ -40,6 +40,7 @@ public class GameCommand implements CommandExecutor {
 					return false;
 				}
 				if(!Minigames.inGame) {
+					p.setScoreboard(Minigames.getBoard());
 					Minigames.getPlayerList().add(p.getName());
 					p.teleport(Minigames.spawn);
 					p.setGameMode(GameMode.ADVENTURE);

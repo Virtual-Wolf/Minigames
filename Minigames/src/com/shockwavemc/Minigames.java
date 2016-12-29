@@ -6,6 +6,7 @@ import java.util.Random;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.*;
 
@@ -17,8 +18,11 @@ public class Minigames extends JavaPlugin {
 	private static ArrayList<String> participating = new ArrayList<String>();
 	private static ArrayList<GameTeam> activeTeams = new ArrayList<GameTeam>();
 	public static Location spawn = new Location(Bukkit.getWorld("Minigames"), 0, 100.5, 0);
+	public static Minigames instance;
+	private static World gameWorld;
 	
 	public void onEnable() {
+		instance = this;
 		board = sMan.getNewScoreboard();
 		new GameCommand(this);
 		new GameListener(this);
@@ -28,8 +32,16 @@ public class Minigames extends JavaPlugin {
 		
 	}
 	
+	public static World getGameWorld() {
+		return gameWorld;
+	}
+	
 	public static ArrayList<String> getPlayerList() {
 		return participating;
+	}
+	
+	public static ArrayList<GameTeam> getTeamList() {
+		return activeTeams;
 	}
 	
 	public static Scoreboard getBoard() {
