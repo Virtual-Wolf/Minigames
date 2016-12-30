@@ -26,7 +26,7 @@ public class Minigames extends JavaPlugin {
 	public static boolean inGame, starting = false;
 	private static ArrayList<String> participating = new ArrayList<String>();
 	private static ArrayList<GameTeam> activeTeams = new ArrayList<GameTeam>();
-	public static Location spawn = new Location(Bukkit.getWorld("Minigames"), 0, 100.5, 0);
+	public static Location spawn;
 	public static Minigames instance;
 	private static World gameWorld;
 	
@@ -35,6 +35,9 @@ public class Minigames extends JavaPlugin {
 		new GameCommand(this);
 		new WorldCommand(this);
 		new GameListener(this);
+		WorldUtils.createWorld("Minigames");
+		spawn = new Location(Bukkit.getWorld("Minigames"), 0, 100.5, 0);
+		WorldUtils.createWorld("Prison");
 		Database.enable();
 		sMan = Bukkit.getScoreboardManager();
 		board = sMan.getNewScoreboard();
@@ -73,8 +76,19 @@ public class Minigames extends JavaPlugin {
 	}
 	
 	public static void killPlayer(Player p) {
-		p.setHealth(p.getMaxHealth());
-		getCurrentGame().game.killPlayer(p);
+		if(inGame) {
+			p.setHealth(p.getMaxHealth());
+			getCurrentGame().game.killPlayer(p);
+		} else {
+			p.teleport(spawn);
+		}
+	}
+	
+	public static void playerLeave(Player p) {
+		p.teleport(Bukkit.getWorld("world").getSpawnLocation());
+		getPlayerList().remove(p.getName());
+		if(inGame)
+			getCurrentGame().game.playerLeave(p);
 	}
 	
 	public static void Broadcast(boolean prefix, String message) {
@@ -97,13 +111,14 @@ public class Minigames extends JavaPlugin {
 		}
 		starting = true;
 		getNewGame();
-		Broadcast(false, "&e&l" + current.name + " &7&o has been chosen as the next game.");
+		Broadcast(false, "&e&l" + current.name + "&7&o has been chosen as the next game.");
 		countdown(45);
 	}
 	
 	private static void countdown(int num) {
 		if(getPlayerList().size() < 2){
 			Broadcast(false, "&7Game cancelled! not enough players.");
+			starting = false;
 			return;
 		}
 		if(num> 0) {
@@ -135,13 +150,16 @@ public class Minigames extends JavaPlugin {
 	
 	@SuppressWarnings("deprecation")
 	public static void end(String winner) {
-		Broadcast(true, "&a&l" + winner + "&7 has won &6&0" + getCurrentGame().name);
+		inGame = false;
+		Broadcast(true, "&a&l" + winner + "&7 has won &6&o" + getCurrentGame().name);
 		Bukkit.getScheduler().runTaskLater(Minigames.instance, new Runnable() {
 			public void run() {
 				for(String s : Minigames.getPlayerList()) {
 					Player p = Bukkit.getPlayer(s);
 					p.teleport(spawn);
 					p.setGameMode(GameMode.ADVENTURE);
+					p.getInventory().clear();
+					WorldUtils.deleteWorld(getGameWorld());
 				}
 				Minigames.run();
 			}

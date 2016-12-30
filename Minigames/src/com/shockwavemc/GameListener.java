@@ -3,17 +3,24 @@ package com.shockwavemc;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
 
 public class GameListener implements Listener {
 	
 	public GameListener(Minigames mgs) {
 		mgs.getServer().getPluginManager().registerEvents(this, mgs);
+	}
+	
+	
+	@EventHandler
+	public void playerLeave(PlayerQuitEvent e) {
+	 if(Minigames.getPlayerList().contains(e.getPlayer().getName()))
+			 Minigames.playerLeave(e.getPlayer());
 	}
 	
 	@EventHandler
@@ -30,8 +37,10 @@ public class GameListener implements Listener {
 	
 	@EventHandler
 	public void move(PlayerMoveEvent e) {
-		if(e.getPlayer().getLocation().getY() <= 80) {
-			Minigames.killPlayer(e.getPlayer());
+		if(Minigames.getPlayerList().contains(e.getPlayer().getName())) {
+				if(e.getPlayer().getLocation().getY() <= 80) {
+					Minigames.killPlayer(e.getPlayer());
+				}
 		}
 	}
 	

@@ -7,5 +7,5 @@ public interface Minigame {
 	public void start();
 	public void run();
 	public void killPlayer(Player p);
-	public void killPlayer(String n);
+	public void playerLeave(Player p);
 }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -22,7 +23,7 @@ public class Brawl implements Minigame, Listener {
 		mgs.getServer().getPluginManager().registerEvents(this, mgs);
 	}
 	
-	private String p1, p2;
+	private String p1 = "", p2 = "";
 	private ArrayList<String> players = new ArrayList<String>();
 
 	@SuppressWarnings("deprecation")
@@ -47,7 +48,11 @@ public class Brawl implements Minigame, Listener {
 	Random r = new Random();
 	@SuppressWarnings("deprecation")
 	@Override
-	public void run() {
+	public void run() { 
+		if(Bukkit.getPlayer(p1) != null)
+			Bukkit.getPlayer(p1).teleport(Minigames.getGameWorldFile().getLocation("lobby"));
+		if(Bukkit.getPlayer(p2) != null)
+			Bukkit.getPlayer(p2).teleport(Minigames.getGameWorldFile().getLocation("lobby"));
 		if(players.size() > 1) {
 			if(thisRound.size() > 1) {
 				p1 = thisRound.get(r.nextInt(thisRound.size()));
@@ -59,13 +64,15 @@ public class Brawl implements Minigame, Listener {
 				Bukkit.getPlayer(p2).teleport(Minigames.getGameWorldFile().getLocation("spawn2"));
 			} else {
 				thisRound.clear();
-				thisRound = players;
+				for(String s : players) {
+					thisRound.add(s);
+				}
 				run();
 			}
 		} else {
+			Minigames.end(players.get(0));
 			players.clear();
 			thisRound.clear();
-			Minigames.end(players.get(0));
 		}
 	}
 	
@@ -78,13 +85,6 @@ public class Brawl implements Minigame, Listener {
 			return true;
 		}
 		return false;
-	}
-	
-	@EventHandler
-	public void playerLeave(PlayerQuitEvent e) {
-		if(gameRunning()) {
-			killPlayer(e.getPlayer());
-		}
 	}
 	
 	@EventHandler
@@ -113,6 +113,8 @@ public class Brawl implements Minigame, Listener {
 	@Override
 	public void killPlayer(Player p) {
 		if(gameRunning()) {
+		p.teleport(Minigames.getGameWorldFile().getLocation("lobby"));
+		p.setGameMode(GameMode.SPECTATOR);	
 			p.setHealth(p.getMaxHealth());
 			if(players.contains(p.getName())) {
 				players.remove(p.getName());
@@ -123,14 +125,23 @@ public class Brawl implements Minigame, Listener {
 			if(isBrawler(p)) {
 				run();
 			}
-			p.teleport(Minigames.getGameWorldFile().getLocation("lobby"));
 		}
 	}
 
 	@Override
-	public void killPlayer(String n) {
-		// TODO Auto-generated method stub
-		
+	public void playerLeave(Player p) {
+		if(gameRunning()) {
+			p.setHealth(p.getMaxHealth());
+			if(players.contains(p.getName())) {
+				players.remove(p.getName());
+				if(thisRound.contains(p.getName())) {
+					thisRound.remove(p.getName());
+				}
+			}
+			if(isBrawler(p)) {
+				run();
+			}
+		}
 	}
 
 }

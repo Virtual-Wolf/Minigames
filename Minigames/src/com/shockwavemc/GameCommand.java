@@ -39,6 +39,10 @@ public class GameCommand implements CommandExecutor {
 					sender.sendMessage(ChatColor.RED + "Only players can join minigames!");
 					return false;
 				}
+				if(Minigames.getPlayerList().contains(p.getName())) {
+					 p.sendMessage(ChatColor.RED + "You're already playing minigames!");
+					 return false;
+				 }
 				if(!Minigames.inGame) {
 					p.setScoreboard(Minigames.getBoard());
 					Minigames.getPlayerList().add(p.getName());
@@ -48,13 +52,44 @@ public class GameCommand implements CommandExecutor {
 					p.setHealth(p.getMaxHealth());
 					p.setFoodLevel(20);
 					p.setSaturation(20);
+					p.getInventory().clear();
 					p.sendMessage(ChatColor.GRAY + "Minigames will start shortly!");
 					if(!Minigames.starting) {
 						Minigames.run();
 					}
 					return false;
+				} else {
+					p.setScoreboard(Minigames.getBoard());
+					Minigames.getPlayerList().add(p.getName());
+					p.teleport(Minigames.getGameWorldFile().getLocation("lobby"));
+					p.setGameMode(GameMode.SPECTATOR);
+					p.setFlying(false);
+					p.setHealth(p.getMaxHealth());
+					p.setFoodLevel(20);
+					p.setSaturation(20);
+					p.getInventory().clear();
+					p.sendMessage(ChatColor.GRAY + "Minigames will start shortly!");
 				}
 			}
+			
+			if(args[0].equalsIgnoreCase("leave")) {
+				if(args.length > 1) {
+					sender.sendMessage(ChatColor.RED + "Incorrect Syntax. Use /mg join");
+					return false;
+				}
+				if(!isPlayer) {
+					sender.sendMessage(ChatColor.RED + "Only players can leave minigames!");
+					return false;
+				}
+				 if(Minigames.getPlayerList().contains(p.getName())) {
+					Minigames.playerLeave(p); 
+					p.setGameMode(GameMode.SURVIVAL);
+					p.sendMessage(ChatColor.RED + "You have left minigames!");
+				 } else {
+					 p.sendMessage(ChatColor.RED + "You aren't in minigames!");
+				 }
+			} 
+			
 		}
 		return false;
 	}
