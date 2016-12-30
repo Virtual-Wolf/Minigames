@@ -57,10 +57,16 @@ public class WorldFile {
 	public Location getLocation(String path) {
 		try {
 		double x, y, z;
+		float pitch, yaw;
 			x = getConfig().getDouble(path + ".x");
 			y = getConfig().getDouble(path + ".y");
 			z = getConfig().getDouble(path + ".z");
-			return new Location(world, x, y, z);
+			pitch = (float) getConfig().get(path + ".pitch");
+			yaw = (float) getConfig().get(path + ".yaw");
+			Location loc = new Location(world, x, y, z);
+			loc.setPitch(pitch);
+			loc.setYaw(yaw);
+			return loc;
 		} catch(Exception e) {
 			return null;
 		}
@@ -70,6 +76,8 @@ public class WorldFile {
 		getConfig().set(path + ".x", loc.getX());
 		getConfig().set(path + ".y", loc.getY());
 		getConfig().set(path + ".z", loc.getZ());
+		getConfig().set(path + ".pitch", loc.getPitch());
+		getConfig().set(path + ".yaw", loc.getYaw());
 		saveConfig();
 	}
 
