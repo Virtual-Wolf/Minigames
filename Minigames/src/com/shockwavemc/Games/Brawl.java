@@ -1,6 +1,6 @@
 package com.shockwavemc.Games;
 
-import java.util.ArrayList;
+import java.util.ArrayList; 
 import java.util.Random;
 
 import org.bukkit.Bukkit;
@@ -10,7 +10,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 
 import com.shockwavemc.Game;
 import com.shockwavemc.Minigame;
@@ -29,6 +28,8 @@ public class Brawl implements Minigame, Listener {
 	@SuppressWarnings("deprecation")
 	@Override
 	public void start() {
+		p1 = "";
+		p2 = "";
 		WorldFile wf = new WorldFile(Minigames.getGameWorld());
 		for(String s : Minigames.getPlayerList()) {
 			Bukkit.getPlayer(s).teleport(wf.getLocation("lobby"));
@@ -36,9 +37,10 @@ public class Brawl implements Minigame, Listener {
 		run();
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public void teamSplit() {
+		players.clear();
+		thisRound.clear();
 		for(String s : Minigames.getPlayerList()) {
 			players.add(s);
 		}
@@ -76,6 +78,7 @@ public class Brawl implements Minigame, Listener {
 		}
 	}
 	
+	@Override
 	public boolean gameRunning() {
 		return (Minigames.inGame && Minigames.getCurrentGame() == Game.Brawl);
 	}
@@ -111,7 +114,7 @@ public class Brawl implements Minigame, Listener {
 	}
 
 	@Override
-	public void killPlayer(Player p) {
+	public void killPlayer(Player p, Player k) {
 		if(gameRunning()) {
 		p.teleport(Minigames.getGameWorldFile().getLocation("lobby"));
 		p.setGameMode(GameMode.SPECTATOR);	
@@ -123,6 +126,7 @@ public class Brawl implements Minigame, Listener {
 				}
 			}
 			if(isBrawler(p)) {
+				Minigames.Broadcast(false, "&6&o" + p.getName() + " &7fell off!");
 				run();
 			}
 		}

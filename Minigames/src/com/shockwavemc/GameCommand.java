@@ -63,7 +63,6 @@ public class GameCommand implements CommandExecutor {
 					Minigames.getPlayerList().add(p.getName());
 					p.teleport(Minigames.getGameWorldFile().getLocation("lobby"));
 					p.setGameMode(GameMode.SPECTATOR);
-					p.setFlying(false);
 					p.setHealth(p.getMaxHealth());
 					p.setFoodLevel(20);
 					p.setSaturation(20);
@@ -74,7 +73,7 @@ public class GameCommand implements CommandExecutor {
 			
 			if(args[0].equalsIgnoreCase("leave")) {
 				if(args.length > 1) {
-					sender.sendMessage(ChatColor.RED + "Incorrect Syntax. Use /mg join");
+					sender.sendMessage(ChatColor.RED + "Incorrect Syntax. Use /mg leave");
 					return false;
 				}
 				if(!isPlayer) {
@@ -83,13 +82,39 @@ public class GameCommand implements CommandExecutor {
 				}
 				 if(Minigames.getPlayerList().contains(p.getName())) {
 					Minigames.playerLeave(p); 
-					p.setGameMode(GameMode.SURVIVAL);
 					p.sendMessage(ChatColor.RED + "You have left minigames!");
 				 } else {
 					 p.sendMessage(ChatColor.RED + "You aren't in minigames!");
 				 }
 			} 
-			
+			if(!isPlayer || p.isOp()) {
+				if(args[0].equalsIgnoreCase("start")) {
+					if(Minigames.starting != true && Minigames.inGame != true) {
+						Minigames.run();
+					}
+				}
+				if(args[0].equalsIgnoreCase("force")) {
+					if(!Minigames.inGame) {
+						Game g = null;
+						for(Game game : Game.values()) {
+							if(game.name.equalsIgnoreCase(args[1])) {
+								g = game;
+							}
+						}
+						if(g != null)  {
+							Minigames.current = g;
+							Minigames.Broadcast(true, "&9&o" + sender.getName() + " &7has forced &e&l" + g.name);
+						}
+					}
+				}
+				if(args[0].equalsIgnoreCase("stop")) {
+					if(Minigames.starting = true) {
+						Minigames.starting = false;
+					} else if(Minigames.inGame) {
+						Minigames.end(null);
+					}					
+				}
+			}
 		}
 		return false;
 	}

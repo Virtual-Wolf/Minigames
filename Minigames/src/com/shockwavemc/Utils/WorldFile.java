@@ -61,13 +61,14 @@ public class WorldFile {
 			x = getConfig().getDouble(path + ".x");
 			y = getConfig().getDouble(path + ".y");
 			z = getConfig().getDouble(path + ".z");
-			pitch = (float) getConfig().get(path + ".pitch");
-			yaw = (float) getConfig().get(path + ".yaw");
+			pitch = (float) getConfig().getDouble(path + ".pitch");
+			yaw = (float) getConfig().getDouble(path + ".yaw");
 			Location loc = new Location(world, x, y, z);
 			loc.setPitch(pitch);
 			loc.setYaw(yaw);
 			return loc;
 		} catch(Exception e) {
+			e.printStackTrace();
 			return null;
 		}
 	}

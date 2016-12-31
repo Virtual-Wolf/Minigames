@@ -1,8 +1,11 @@
 package com.shockwavemc;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
@@ -39,15 +42,43 @@ public class GameListener implements Listener {
 	public void move(PlayerMoveEvent e) {
 		if(Minigames.getPlayerList().contains(e.getPlayer().getName())) {
 				if(e.getPlayer().getLocation().getY() <= 80) {
-					Minigames.killPlayer(e.getPlayer());
+					Minigames.killPlayer(e.getPlayer(), null);
 				}
 		}
 	}
 	
 	@EventHandler
 	public void onCombat(EntityDamageEvent e) {
-		if(e.getEntity() instanceof Player && !Minigames.inGame && Minigames.getPlayerList().contains(((Player)e.getEntity()).getName())) {
-			e.setCancelled(true);
+		if(e.getEntity() instanceof Player) {
+			Player p = (Player)e.getEntity();
+			if(Minigames.getPlayerList().contains(p.getName())) {
+				if(!Minigames.inGame) {
+					e.setCancelled(true);
+				} else {
+					if((p.getHealth() - e.getDamage()) <= 0) {
+						e.setDamage(0);
+						Bukkit.getScheduler().runTaskLater(Minigames.instance, new Runnable() {public void run() {Minigames.killPlayer(p, null);}}, 4);
+					}
+				}
+			}
+		} 
+	}
+	
+	@EventHandler(priority = EventPriority.LOW)
+	public void combat(EntityDamageByEntityEvent e) {
+		if(e.getEntity() instanceof Player) {
+			Player p = (Player)e.getEntity();
+			if(Minigames.getPlayerList().contains(p.getName())) {
+				if(Minigames.inGame) {
+					if(e.getDamager() instanceof Player) {
+						Player k = (Player) e.getDamager(); 
+						if((p.getHealth() - e.getDamage()) <= 0) {
+							e.setDamage(0);
+							Bukkit.getScheduler().runTaskLater(Minigames.instance, new Runnable() {public void run() {Minigames.killPlayer(p, k);}}, 4);
+						}
+					}
+				}
+			}
 		}
 	}
 	
